@@ -42,9 +42,9 @@ Ideal for forms with:
 
 ## Demo
 
-[![dark.png](.github/resources/dark.png)](https://youtu.be/ONHLSC0Znew)
+[![dark.png](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/refs/heads/main/.github/resources/dark.png)](https://youtu.be/ONHLSC0Znew)
 
-[![light.png](.github/resources/light.png)](https://youtu.be/ONHLSC0Znew)
+[![light.png](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/refs/heads/main/.github/resources/light.png)](https://youtu.be/ONHLSC0Znew)
 
 ## WIP...
 
