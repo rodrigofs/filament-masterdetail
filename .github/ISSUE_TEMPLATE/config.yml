@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security issue
+    url: https://github.com/rodrigofs/filament-masterdetail/security/policy
+    about: Learn how to notify us for sensitive bugs
+  - name: Report a bug
+    url: https://github.com/rodrigofs/filament-masterdetail/issues/new
+    about: Report a reproducable bug

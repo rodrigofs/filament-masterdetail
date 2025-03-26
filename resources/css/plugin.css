@@ -1,0 +1,121 @@
+.filament-masterdetail-container {
+    @apply m-0 mt-1 !important;
+}
+
+.filament-masterdetail-component .choices input {
+    min-width: 100% !important;
+}
+
+.filament-masterdetail-column.has-hidden-label .fi-fo-field-wrp > label {
+    @apply not-sr-only text-sm !mb-2 block md:sr-only;
+}
+
+@media (max-width: 640px) {
+    .filament-masterdetail-component.break-point-sm table {
+        @apply block w-full;
+    }
+
+    .filament-masterdetail-component.break-point-sm table thead,
+    .filament-masterdetail-component.break-point-sm table thead tr,
+    .filament-masterdetail-component.break-point-sm table thead th {
+        @apply block !w-full sr-only;
+    }
+
+    .filament-masterdetail-component.break-point-sm table tbody,
+    .filament-masterdetail-component.break-point-sm table tbody tr,
+    .filament-masterdetail-component.break-point-sm table tbody td {
+        @apply block !w-full;
+    }
+
+    .filament-masterdetail-component.break-point-sm table tbody tr {
+        @apply p-2;
+    }
+}
+
+@media (max-width: 768px) {
+    .filament-masterdetail-component.break-point-md table {
+        @apply block w-full;
+    }
+
+    .filament-masterdetail-component.break-point-md table thead,
+    .filament-masterdetail-component.break-point-md table thead tr,
+    .filament-masterdetail-component.break-point-md table thead th {
+        @apply block !w-full sr-only;
+    }
+
+    .filament-masterdetail-component.break-point-md table tbody,
+    .filament-masterdetail-component.break-point-md table tbody tr,
+    .filament-masterdetail-component.break-point-md table tbody td {
+        @apply block !w-full;
+    }
+
+    .filament-masterdetail-component.break-point-md table tbody tr {
+        @apply p-2;
+    }
+}
+
+@media (max-width: 1024px) {
+    .filament-masterdetail-component.break-point-lg table {
+        @apply block w-full;
+    }
+
+    .filament-masterdetail-component.break-point-lg table thead,
+    .filament-masterdetail-component.break-point-lg table thead tr,
+    .filament-masterdetail-component.break-point-lg table thead th {
+        @apply block !w-full sr-only;
+    }
+
+    .filament-masterdetail-component.break-point-lg table tbody,
+    .filament-masterdetail-component.break-point-lg table tbody tr,
+    .filament-masterdetail-component.break-point-lg table tbody td {
+        @apply block !w-full;
+    }
+
+    .filament-masterdetail-component.break-point-lg table tbody tr {
+        @apply p-2;
+    }
+}
+
+@media (max-width: 1280px) {
+    .filament-masterdetail-component.break-point-xl table {
+        @apply block w-full;
+    }
+
+    .filament-masterdetail-component.break-point-xl table thead,
+    .filament-masterdetail-component.break-point-xl table thead tr,
+    .filament-masterdetail-component.break-point-xl table thead th {
+        @apply block !w-full sr-only;
+    }
+
+    .filament-masterdetail-component.break-point-xl table tbody,
+    .filament-masterdetail-component.break-point-xl table tbody tr,
+    .filament-masterdetail-component.break-point-xl table tbody td {
+        @apply block !w-full;
+    }
+
+    .filament-masterdetail-component.break-point-xl table tbody tr {
+        @apply p-2;
+    }
+}
+
+@media (max-width: 1536px) {
+    .filament-masterdetail-component.break-point-2xl table {
+        @apply block w-full;
+    }
+
+    .filament-masterdetail-component.break-point-2xl table thead,
+    .filament-masterdetail-component.break-point-2xl table thead tr,
+    .filament-masterdetail-component.break-point-2xl table thead th {
+        @apply block !w-full sr-only;
+    }
+
+    .filament-masterdetail-component.break-point-2xl table tbody,
+    .filament-masterdetail-component.break-point-2xl table tbody tr,
+    .filament-masterdetail-component.break-point-2xl table tbody td {
+        @apply block !w-full;
+    }
+
+    .filament-masterdetail-component.break-point-2xl table tbody tr {
+        @apply p-2;
+    }
+}
