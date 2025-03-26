@@ -1,0 +1,5 @@
+.filament-masterdetail {
+    .fi-section-content {
+        @apply p-0 !important;
+    }
+}

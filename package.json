@@ -1,0 +1,23 @@
+{
+    "name": "filament-masterdetail",
+    "main": "index.js",
+    "type": "module",
+    "author": "Rodrigo Fernandes <rodrigo-delphi@live.com>",
+    "license": "MIT",
+    "scripts": {
+        "build:styles": "npx tailwindcss -i resources/css/plugin.css -o dist/filament-masterdetail.css --postcss --minify && npm run purge",
+        "build:scripts": "node bin/build.js",
+        "purge": "filament-purge -i dist/filament-masterdetail.css -o dist/filament-masterdetail.css"
+    },
+    "devDependencies": {
+        "@awcodes/filament-plugin-purge": "^1.1.1",
+        "@tailwindcss/forms": "^0.5",
+        "@tailwindcss/typography": "^0.5",
+        "autoprefixer": "^10.4.14",
+        "esbuild": "^0.25.1",
+        "npm-run-all": "^4.1.5",
+        "postcss": "^8.4.26",
+        "postcss-import": "^15.1.0",
+        "tailwindcss": "^3.4"
+    }
+}
