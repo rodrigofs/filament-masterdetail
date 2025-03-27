@@ -10,7 +10,6 @@ use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Str;
-use Rodrigofs\FilamentMasterdetail\Components\Masterdetail;
 
 trait HasFormModal
 {
@@ -145,7 +144,7 @@ trait HasFormModal
             ->modalSubmitActionLabel(function (self $component) {
                 return $component->modalPersistent ? __('filament-masterdetail::masterdetail.modal.add') : __('filament-masterdetail::masterdetail.modal.done');
             })
-            ->modalCancelActionLabel(function (Masterdetail $component) {
+            ->modalCancelActionLabel(function (self $component) {
                 return $component->modalPersistent ? __('filament-masterdetail::masterdetail.modal.done') : __('filament-masterdetail::masterdetail.modal.cancel');
             })
             ->action(function (Action $action, Form $form, self $component, $data): void {
