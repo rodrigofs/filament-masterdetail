@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rodrigofs\FilamentMasterdetail\Components;
 
+use Filament\Actions\Concerns\CanOpenModal;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Contracts\HasHeaderActions;
@@ -15,6 +16,7 @@ use Filament\Tables\Columns\Concerns\HasName;
 final class Masterdetail extends Component implements HasHeaderActions
 {
     use CanBeAutofocused;
+    use CanOpenModal;
     use CanDeleteAction;
     use CanGenerateUuids;
     use CanLimitItemsLength;
