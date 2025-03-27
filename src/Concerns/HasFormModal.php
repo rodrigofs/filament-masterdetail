@@ -134,7 +134,7 @@ trait HasFormModal
             ->stickyModalFooter(fn (self $component) => $component->isModalFooterSticky())
             ->modalIcon(fn (self $component) => $component->getModalIcon())
             ->modalHeading(fn (self $component) => $component->getModalHeading())
-            ->label($this->getLabel() ?? $this->getAddActionLabel())
+            ->label(fn (self $component): string => $component->getLabel() ?? $component->getAddActionLabel())
             ->visible(fn (self $component): bool => $component->isAddable())
             ->form($this->getSchema())
             ->fillForm($this->data)
