@@ -15,6 +15,8 @@
     $statePath = $getStatePath();
     $hasActions =  $deleteAction->isVisible();
     $headerActions = $getHeaderActions();
+
+    $componentId = Str::of($field::class)->replace('\\','-', $field::class)->slug();
 @endphp
 
 
@@ -41,7 +43,9 @@
 
                 <th
                     @class([
-                        'px-3 py-3.5 text-sm font-bold',
+                        'px-6' => $loop->first,
+                        'px-3' => !$loop->first,
+                        'py-3.5 text-sm font-bold',
                         'text-left' => $alignment === Alignment::Start || $alignment === Alignment::Left || $alignment === null,
                         'text-center' => $alignment === Alignment::Center,
                         'text-right' => $alignment === Alignment::End || $alignment === Alignment::Right,
@@ -56,7 +60,7 @@
 
         <tbody class="divide-y divide-gray-200 dark:divide-white/5">
         @forelse ($containers as $uuid => $row)
-            <tr wire:key="{{ $this->getId() }}.{{ $statePath }}.{{ $field::class }}.item">
+            <tr wire:key="{{ $this->getId() }}.{{ $statePath }}.{{ $componentId }}.item">
                 @foreach($row as $cell)
                     @php
                         $alignment = $cell->alignAjust($cell->getAlignment());
@@ -68,7 +72,9 @@
                     @endif
                     <td
                         @class([
-                            'px-3 py-4 whitespace-nowrap text-sm',
+                            'px-6' => $loop->first,
+                            'px-3' => !$loop->first,
+                            'py-4 whitespace-nowrap text-sm',
                             'text-left' => $alignment === Alignment::Start || $alignment === Alignment::Left || $alignment === null,
                             'text-center' => $alignment === Alignment::Center,
                             'text-right' => $alignment === Alignment::End || $alignment === Alignment::Right,
