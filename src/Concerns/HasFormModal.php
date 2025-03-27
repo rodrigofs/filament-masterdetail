@@ -8,7 +8,6 @@ use Closure;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
-use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Str;
 
 trait HasFormModal
@@ -36,11 +35,7 @@ trait HasFormModal
 
     protected bool | Closure $isAddable = true;
 
-    protected MaxWidth | string | Closure | null $modalWidth = null;
-
     protected string | Closure | null $addActionLabel = null;
-
-    private Closure | string | null $modalHeading = null;
 
     public function schema(Closure | array $schema): static
     {
@@ -109,20 +104,6 @@ trait HasFormModal
         return $this;
     }
 
-    public function modalHeading(string | Closure | null $heading): static
-    {
-        $this->modalHeading = $heading;
-
-        return $this;
-    }
-
-    public function modalWidth(MaxWidth | string | Closure | null $width = null): static
-    {
-        $this->modalWidth = $width;
-
-        return $this;
-    }
-
     /**
      * @param  array<string,mixed> | Closure  $data
      * @return $this
@@ -137,16 +118,26 @@ trait HasFormModal
     public function getAddAction(): Action
     {
         $action = Action::make($this->getAddActionName())
-            ->label($this->getLabel() ?? $this->getAddActionLabel())
-            ->visible(fn (self $component): bool => $component->isAddable())
-            ->form($this->getSchema())
-            ->fillForm($this->data)
             ->modalSubmitActionLabel(function (self $component) {
                 return $component->modalPersistent ? __('filament-masterdetail::masterdetail.modal.add') : __('filament-masterdetail::masterdetail.modal.done');
             })
             ->modalCancelActionLabel(function (self $component) {
                 return $component->modalPersistent ? __('filament-masterdetail::masterdetail.modal.done') : __('filament-masterdetail::masterdetail.modal.cancel');
             })
+            ->closeModalByClickingAway(fn (self $component) => !$component->isModalClosedByClickingAway())
+            ->slideOver(fn (self $component) => $component->isModalSlideOver())
+            ->modalWidth(fn (self $component) => $component->getModalWidth())
+            ->modalAlignment(fn (self $component) => $component->getModalAlignment())
+            ->modalAutofocus(fn (self $component) => $component->isModalAutofocused())
+            ->modalDescription(fn (self $component) => $component->getModalDescription())
+            ->stickyModalHeader(fn (self $component) => $component->isModalHeaderSticky())
+            ->stickyModalFooter(fn (self $component) => $component->isModalFooterSticky())
+            ->modalIcon(fn (self $component) => $component->getModalIcon())
+            ->modalHeading(fn (self $component) => $component->getModalHeading())
+            ->label($this->getLabel() ?? $this->getAddActionLabel())
+            ->visible(fn (self $component): bool => $component->isAddable())
+            ->form($this->getSchema())
+            ->fillForm($this->data)
             ->action(function (Action $action, Form $form, self $component, $data): void {
                 $uuid = $component->generateUuid();
 
@@ -178,21 +169,13 @@ trait HasFormModal
                 }
 
             })
-            ->button()
-            ->closeModalByClickingAway(false)
-            ->modalWidth(fn (self $component) => $component->getModalWidth())
-            ->modalHeading(fn (self $component) => $component->getModalHeading());
+            ->button();
 
         if ($this->modalPersistent) {
             $action->modalCancelActionLabel(__('filament-masterdetail::masterdetail.modal.done'));
         }
 
         return $action;
-    }
-
-    public function getModalHeading(): ?string
-    {
-        return $this->evaluate($this->modalHeading);
     }
 
     public function getAddActionLabel(): string
@@ -208,10 +191,5 @@ trait HasFormModal
     private function getSchema(): Closure | array
     {
         return fn () => $this->evaluate($this->schema);
-    }
-
-    private function getModalWidth(): MaxWidth | string | Closure | null
-    {
-        return $this->evaluate($this->modalWidth);
     }
 }
