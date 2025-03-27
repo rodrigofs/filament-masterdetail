@@ -138,6 +138,7 @@ trait HasFormModal
     public function getAddAction(): Action
     {
         $action = Action::make($this->getAddActionName())
+            ->label($this->getLabel() ?? $this->getAddActionLabel())
             ->visible(fn (self $component): bool => $component->isAddable())
             ->form($this->getSchema())
             ->fillForm($this->data)
