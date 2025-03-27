@@ -12,6 +12,7 @@ use Filament\Support\Concerns\{HasDescription, HasHeading, HasIcon, HasIconColor
 use Filament\Forms\Components\Concerns\{CanBeAutofocused, CanGenerateUuids, CanLimitItemsLength, HasHeaderActions as InteractsHeaderActions};
 use Rodrigofs\FilamentMasterdetail\Concerns\{CanDeleteAction, HasFormModal, HasRelationship, HasTable};
 use Filament\Tables\Columns\Concerns\HasName;
+use Illuminate\Support\Str;
 
 final class Masterdetail extends Component implements HasHeaderActions
 {
@@ -59,7 +60,7 @@ final class Masterdetail extends Component implements HasHeaderActions
 
     protected function setUp(): void
     {
-
+        $this->modalHeading($this->getLabel() ?? Str::of($this->getName())->title()->toString());
         $this->afterStateHydrated(static function (self $component, ?array $state): void {
 
             if (is_array($component->hydratedDefaultState) && $component->shouldMergeHydratedDefaultStateWithChildComponentContainerStateAfterStateHydrated) {
