@@ -1,3 +1,9 @@
+<div class="filament-hidden">
+
+![Filament Master Detail](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/main/art/rodrigofs-filament-masterdetail.png)
+
+</div>
+
 # Filament Master Detail
 
 This package is a Filament plugin.
