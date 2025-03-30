@@ -89,6 +89,8 @@ To use the **Filament Master Detail** component, it is essential to configure th
 ## Example
 
 ```php
+use Rodrigofs\FilamentMasterdetail\Components\MasterDetail;
+
 MasterDetail::make('items')
     ->relationship()
     ->modalPersistent()
