@@ -9,7 +9,11 @@ use BladeUI\Icons\BladeIconsServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
 use Filament\Forms\FormsServiceProvider;
+use Filament\Infolists\InfolistsServiceProvider;
+use Filament\Notifications\NotificationsServiceProvider;
 use Filament\Support\SupportServiceProvider;
+use Filament\Tables\TablesServiceProvider;
+use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\LivewireServiceProvider;
@@ -50,12 +54,12 @@ abstract class TestCase extends Orchestra
             BladeIconsServiceProvider::class,
             FilamentServiceProvider::class,
             FormsServiceProvider::class,
-            //InfolistsServiceProvider::class,
+            InfolistsServiceProvider::class,
             LivewireServiceProvider::class,
-            //NotificationsServiceProvider::class,
+            NotificationsServiceProvider::class,
             SupportServiceProvider::class,
-            //TablesServiceProvider::class,
-            //WidgetsServiceProvider::class,
+            TablesServiceProvider::class,
+            WidgetsServiceProvider::class,
             AdminPanelProvider::class,
             FilamentMasterdetailServiceProvider::class,
         ];
