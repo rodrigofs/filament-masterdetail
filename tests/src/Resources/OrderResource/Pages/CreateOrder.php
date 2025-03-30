@@ -1,11 +1,13 @@
 <?php
 
-namespace Rodrigofs\FilamentMasterdetail\Tests\Resources\PageResource\Pages;
+declare(strict_types=1);
+
+namespace Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource\Pages;
 
 use Filament\Resources\Pages\CreateRecord;
-use Rodrigofs\FilamentMasterdetail\Tests\Resources\PageResource;
+use Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource;
 
-class CreatePage extends CreateRecord
+final class CreateOrder extends CreateRecord
 {
-    protected static string $resource = PageResource::class;
+    protected static string $resource = OrderResource::class;
 }

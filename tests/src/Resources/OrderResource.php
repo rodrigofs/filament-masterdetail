@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Rodrigofs\FilamentMasterdetail\Tests\Resources;
 
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\{BulkActionGroup, CreateAction, DeleteBulkAction, EditAction};
+use Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource\Pages\{CreateOrder, EditOrder, ListOrders};
 use Filament\Tables\Table;
-use Rodrigofs\FilamentMasterdetail\Tests\Models\Order;
-use Rodrigofs\FilamentMasterdetail\Tests\Resources\PageResource\Pages\CreatePage;
-use Rodrigofs\FilamentMasterdetail\Tests\Resources\PageResource\Pages\EditPage;
+use Rodrigofs\FilamentMasterdetail\Components\{DataColumn, Masterdetail};
+use Rodrigofs\FilamentMasterdetail\Tests\Models\{Order, Product};
 
-class PageResource extends Resource
+final class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
@@ -23,7 +23,37 @@ class PageResource extends Resource
     {
         return $form
             ->schema([
+                TextInput::make('customer_name')
+                    ->label('Name')
+                    ->required(),
 
+                Masterdetail::make('items')
+                    ->relationship()
+                    ->addActionLabel('Add Item')
+                    ->modalHeading('Add Item')
+                    ->modalDescription('Add a new item to the order.')
+                    ->modalIcon('heroicon-o-plus')
+                    ->modalWidth('lg')
+                    ->schema([
+                        TextInput::make('product_id')
+                            ->label('Product ID'),
+                        TextInput::make('quantity')
+                            ->label('Quantity'),
+                        TextInput::make('price')
+                            ->label('Price'),
+                    ])
+                    ->columns([
+                        DataColumn::make('product_id')
+                            ->formatStateUsing(fn ($state): string => Product::find($state)->name ?? $state)
+                            ->label('Product')
+                            ->columnWidth('w-1/3'),
+                        DataColumn::make('quantity')
+                            ->label('Quantity')
+                            ->columnWidth('w-1/3'),
+                        DataColumn::make('price')
+                            ->label('Price')
+                            ->columnWidth('w-1/3'),
+                    ]),
             ])->columns(1);
     }
 
@@ -59,9 +89,9 @@ class PageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListPages::route('/'),
-            'create' => CreatePage::route('/create'),
-            'edit' => EditPage::route('/{record}/edit'),
+            'index' => ListOrders::route('/'),
+            'create' => CreateOrder::route('/create'),
+            'edit' => EditOrder::route('/{record}/edit'),
         ];
     }
 }

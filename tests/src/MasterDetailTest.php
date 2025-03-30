@@ -2,14 +2,90 @@
 
 declare(strict_types=1);
 
-use Filament\Forms\Components\TextInput;
+namespace Rodrigofs\FilamentMasterdetail\Tests;
+
 use Filament\Forms\Form;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\{Arr, Carbon, Str};
 use Rodrigofs\FilamentMasterdetail\Components\{DataColumn, Masterdetail};
-use Rodrigofs\FilamentMasterdetail\Tests\Fixtures\Livewire;
+use Rodrigofs\FilamentMasterdetail\Tests\Fixtures\Livewire as LivewireFixtures;
+use Rodrigofs\FilamentMasterdetail\Tests\Models\{Order, OrderItem};
+use Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource\Pages\{CreateOrder, EditOrder};
 
 use function Pest\Livewire\livewire;
+
+it('has masterdetail field', function () {
+    livewire(TestComponentWithForm::class)
+        ->assertFormComponentExists('items');
+});
+
+it('can create record master detail', function () {
+
+    $order = Order::factory()->make();
+
+    livewire(CreateOrder::class)
+        ->fillForm([
+            'customer_name' => $order->customer_name,
+        ])
+        ->callFormComponentAction(component: 'items', name: 'add', data: [
+            'product_id' => '23',
+            'quantity' => 2,
+            'price' => 10.00,
+        ])
+        ->callFormComponentAction(component: 'items', name: 'add', data: [
+            'product_id' => '24',
+            'quantity' => 1,
+            'price' => 20.00,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $storedPage = Order::query()->where('customer_name', $order->customer_name)->first();
+
+    $this->assertDatabaseHas(Order::class, [
+        'id' => $storedPage->getKey(),
+        'customer_name' => $order->customer_name,
+    ]);
+
+    $this->assertDatabaseCount('order_items', 2);
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $storedPage->getKey(),
+        'product_id' => 23,
+        'quantity' => 2,
+        'price' => 10.00,
+    ]);
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $storedPage->getKey(),
+        'product_id' => 24,
+        'quantity' => 1,
+        'price' => 20.00,
+    ]);
+});
+
+it('can delete record detail', function () {
+
+    $order = Order::factory()
+        ->has(OrderItem::factory()->count(3), 'items')
+        ->create();
+
+    $component = livewire(EditOrder::class, [
+        'record' => $order->getKey(),
+    ]);
+
+    $component->assertSuccessful();
+
+    $state = $component->get('data.items');
+
+    $component->callFormComponentAction(component: 'items', name: 'delete', arguments: [
+        'item' => array_key_first($state),
+    ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+
+    $this->assertDatabaseCount('order_items', 2);
+});
 
 it('can set up a relationship without providing the name ', function () {
     expect(Masterdetail::make('test'))
@@ -145,125 +221,17 @@ it('can set the data column width', function () {
         ->getColumnWidth()->toBe('lg');
 });
 
-it('can set the data column is sortable', function () {
-    expect(DataColumn::make(''))
-        ->state('stateTest')
-        ->formatStateUsing(fn($state) => Str::slug($state->getState()))->toBe('state-test');
-});
-
-
-
-//it('can fill and assert data in a MasterDetail', function (array $data) {
-//    $undoRepeaterFake = Masterdetail::fake();
-//
-//    livewire(TestComponentWithMasterDetail::class)
-//        ->fillForm($data)
-//        ->assertFormSet($data);
-//
-//    $undoRepeaterFake();
-//})->with([
-//    'normal' => fn (): array => ['normal' => [
-//        [
-//            'title' => Str::random(),
-//            'category' => Str::random(),
-//        ],
-//        [
-//            'title' => Str::random(),
-//            'category' => Str::random(),
-//        ],
-//        [
-//            'title' => Str::random(),
-//            'category' => Str::random(),
-//        ],
-//    ]],
-//]);
-//
-//it('can remove items from a master MasterDetail', function () {
-//    $undoRepeaterFake = Masterdetail::fake();
-//
-//    livewire(TestComponentWithMasterDetail::class)
-//        ->fillForm($data = [
-//            'normal' => [
-//                [
-//                    'title' => Str::random(),
-//                    'category' => Str::random(),
-//                ],
-//                [
-//                    'title' => Str::random(),
-//                    'category' => Str::random(),
-//                ],
-//            ],
-//        ])
-//        ->assertFormSet($data)
-//        ->fillForm([
-//            'normal' => [
-//                Arr::first($data['normal']),
-//            ],
-//        ])
-//        ->assertFormSet(function (array $data) {
-//            expect($data['normal'])->toHaveCount(1);
-//
-//            return [
-//                'normal' => [
-//                    Arr::first($data['normal']),
-//                ],
-//            ];
-//        });
-//
-//    $undoRepeaterFake();
-//});
-//
-//it('can render datacolumn in MasterDetail', function () {
-//    $undoRepeaterFake = Masterdetail::fake();
-//
-//    livewire(TestComponentWithMasterDetail::class)
-//        ->fillForm($data = [
-//            'normal' => [
-//                [
-//                    'title' => Str::random(),
-//                    'category' => Str::random(),
-//                ],
-//                [
-//                    'title' => Str::random(),
-//                    'category' => Str::random(),
-//                ],
-//            ],
-//        ])
-//        ->assertFormSet($data)
-//        ->fillForm([
-//            'normal' => [
-//                Arr::first($data['normal']),
-//            ],
-//        ])
-//        ->assertSeeText(['Category Column', 'Title Column']);
-//
-//    $undoRepeaterFake();
-//});
-//
-final class TestComponentWithMasterDetail extends Livewire
+final class TestComponentWithForm extends LivewireFixtures
 {
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Masterdetail::make('normal')
-                    ->modalHeading('Test Title Modal')
-                    ->table([
-                        DataColumn::make('title')
-                            ->label('Title Column'),
-                        DataColumn::make('category')
-                            ->label('Category Column'),
-                    ])
-                    ->schema([
-                        TextInput::make('title'),
-                        TextInput::make('category'),
-                    ]),
-            ])
-            ->statePath('data');
+        return $form->schema([
+            Masterdetail::make('items')
+        ]);
     }
 
     public function render(): View
     {
-        return view('forms.fixtures.form');
+        return view('fixtures.form');
     }
 }

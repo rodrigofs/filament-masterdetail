@@ -1,14 +1,16 @@
 <?php
 
-namespace Rodrigofs\FilamentMasterdetail\Tests\Resources\PageResource\Pages;
+declare(strict_types=1);
+
+namespace Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource\Pages;
 
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use Rodrigofs\FilamentMasterdetail\Tests\Resources\PageResource;
+use Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource;
 
-class EditPage extends EditRecord
+final class EditOrder extends EditRecord
 {
-    protected static string $resource = PageResource::class;
+    protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
     {

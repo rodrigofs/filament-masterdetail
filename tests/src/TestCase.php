@@ -9,19 +9,29 @@ use BladeUI\Icons\BladeIconsServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
 use Filament\Forms\FormsServiceProvider;
-use Filament\Infolists\InfolistsServiceProvider;
-use Filament\Notifications\NotificationsServiceProvider;
 use Filament\Support\SupportServiceProvider;
-use Filament\Tables\TablesServiceProvider;
-use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\LivewireServiceProvider;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Rodrigofs\FilamentMasterdetail\FilamentMasterdetailServiceProvider;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 
+#[WithMigration]
 abstract class TestCase extends Orchestra
 {
+    use LazilyRefreshDatabase;
+
+    public function getEnvironmentSetUp($app): void
+    {
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('view.paths', [
+            ...$app['config']->get('view.paths'),
+            __DIR__ . '/../resources/views',
+        ]);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -38,30 +48,21 @@ abstract class TestCase extends Orchestra
             BladeCaptureDirectiveServiceProvider::class,
             BladeHeroiconsServiceProvider::class,
             BladeIconsServiceProvider::class,
-            // FilamentServiceProvider::class,
+            FilamentServiceProvider::class,
             FormsServiceProvider::class,
-            InfolistsServiceProvider::class,
+            //InfolistsServiceProvider::class,
             LivewireServiceProvider::class,
-            NotificationsServiceProvider::class,
+            //NotificationsServiceProvider::class,
             SupportServiceProvider::class,
-            TablesServiceProvider::class,
-            // WidgetsServiceProvider::class,
+            //TablesServiceProvider::class,
+            //WidgetsServiceProvider::class,
+            AdminPanelProvider::class,
             FilamentMasterdetailServiceProvider::class,
         ];
     }
 
-    public function getEnvironmentSetUp($app): void
+    protected function defineDatabaseMigrations(): void
     {
-        config()->set('database.default', 'testing');
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_filament-price-filter_table.php.stub';
-        $migration->up();
-        */
-
-        $app['config']->set('view.paths', [
-            ...$app['config']->get('view.paths'),
-            __DIR__ . '/resources/views',
-        ]);
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }
 }

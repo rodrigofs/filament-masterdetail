@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Rodrigofs\FilamentMasterdetail\Tests\Resources\PageResource\Pages;
+namespace Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource\Pages;
 
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\ListRecords;
-use Rodrigofs\FilamentMasterdetail\Tests\Resources\PageResource;
+use Filament\Resources\Pages\{ListRecords};
+use Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource;
 
-class ListPage extends ListRecords
+final class ListOrders extends ListRecords
 {
-    protected static string $resource = PageResource::class;
+    protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
     {
