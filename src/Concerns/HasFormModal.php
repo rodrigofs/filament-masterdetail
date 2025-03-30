@@ -118,12 +118,8 @@ trait HasFormModal
     public function getAddAction(): Action
     {
         $action = Action::make($this->getAddActionName())
-            ->modalSubmitActionLabel(function (self $component) {
-                return $component->modalPersistent ? __('filament-masterdetail::masterdetail.modal.add') : __('filament-masterdetail::masterdetail.modal.done');
-            })
-            ->modalCancelActionLabel(function (self $component) {
-                return $component->modalPersistent ? __('filament-masterdetail::masterdetail.modal.done') : __('filament-masterdetail::masterdetail.modal.cancel');
-            })
+            ->modalSubmitActionLabel(fn (self $component) => $component->getModalSubmitActionLabel())
+            ->modalCancelActionLabel(fn (self $component) => $component->getModalCancelActionLabel())
             ->closeModalByClickingAway(fn (self $component) => !$component->isModalClosedByClickingAway())
             ->slideOver(fn (self $component) => $component->isModalSlideOver())
             ->modalWidth(fn (self $component) => $component->getModalWidth())
@@ -183,6 +179,11 @@ trait HasFormModal
         return $this->evaluate($this->addActionLabel) ?? __('filament-masterdetail::masterdetail.add', [
             'label' => Str::lcfirst($this->getLabel()),
         ]);
+    }
+
+    public function isModalPersistent(): bool
+    {
+        return $this->modalPersistent;
     }
 
     /**
