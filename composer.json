@@ -9,8 +9,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Rodrigofs\\FilamentMasterdetail\\Tests\\": "tests/",
-            "Rodrigofs\\FilamentMasterdetail\\Database\\Factories\\": "database/factories/"
+            "Rodrigofs\\FilamentMasterdetail\\Tests\\": "tests/src",
+            "Rodrigofs\\FilamentMasterdetail\\Tests\\datababe\\factories\\": "tests/database/factories"
         }
     },
     "authors": [
@@ -21,15 +21,14 @@
     ],
     "require": {
         "php": "^8.1",
-        "spatie/laravel-package-tools": "^1.91",
-        "filament/forms": "^3.3",
-        "filament/tables": "^3.3"
+        "filament/filament": "^3.2",
+        "spatie/laravel-package-tools": "^1.92"
     },
     "require-dev": {
         "laravel/pint": "^v1.21",
         "orchestra/testbench": "^8.8|^9.0|^10.0",
         "nunomaduro/collision": "^7.8|^v8.7",
-        "filament/support": "^3.3",
+        "filament/support": "^3.2",
         "pestphp/pest": "^v3.7.2",
         "pestphp/pest-plugin-laravel": "v3.1.0",
         "pestphp/pest-plugin-livewire": "v3.0.0",
