@@ -70,7 +70,6 @@ trait HasTable
 
         foreach ($this->getState() ?? [] as $uuid => $rowData) {
             $rowItem = [];
-
             /** @var DataColumn $tableField */
             foreach ($this->tableFields as $tableField) {
                 $rowItem[] = $tableField

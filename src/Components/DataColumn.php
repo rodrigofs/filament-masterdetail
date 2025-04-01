@@ -6,15 +6,24 @@ namespace Rodrigofs\FilamentMasterdetail\Components;
 
 use Closure;
 use Filament\Support\Components\Component;
-use Filament\Support\Concerns\{CanGrow, HasAlignment};
-use Filament\Tables\Columns\Concerns\{CanFormatState, CanSpanColumns, HasLabel, HasName, HasRowLoopObject};
+use Filament\Support\Concerns\{CanGrow, HasAlignment, HasCellState};
 use Filament\Support\Enums\Alignment;
+use Filament\Tables\Columns\Concerns\{BelongsToLayout,
+    CanFormatState,
+    CanSpanColumns,
+    HasLabel,
+    HasName,
+    HasRecord,
+    HasRowLoopObject};
 use Rodrigofs\FilamentMasterdetail\Concerns\CanBeHidden;
 
 final class DataColumn extends Component
 {
     use CanBeHidden;
     use CanFormatState;
+    use HasCellState;
+    use HasRecord;
+    use BelongsToLayout;
     use CanGrow;
     use CanSpanColumns;
     use HasAlignment;
@@ -72,9 +81,7 @@ final class DataColumn extends Component
 
     public function getState(): mixed
     {
-        return ($this->getStateUsing !== null) ?
-            $this->evaluate($this->getStateUsing) :
-            $this->state;
+        return ($this->getStateUsing !== null) ? $this->evaluate($this->getStateUsing) : $this->state;
     }
 
     /**
