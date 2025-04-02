@@ -11,7 +11,7 @@ use Filament\Tables\Actions\{BulkActionGroup, CreateAction, DeleteBulkAction, Ed
 use Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource\Pages\{CreateOrder, EditOrder, ListOrders};
 use Filament\Tables\Table;
 use Rodrigofs\FilamentMasterdetail\Components\{DataColumn, Masterdetail};
-use Rodrigofs\FilamentMasterdetail\Tests\Models\{Order, Product};
+use Rodrigofs\FilamentMasterdetail\Tests\Models\{Order};
 
 final class OrderResource extends Resource
 {
@@ -43,13 +43,14 @@ final class OrderResource extends Resource
                             ->label('Price'),
                     ])
                     ->columns([
-                        DataColumn::make('product_id')
-                            ->formatStateUsing(fn ($state): string => Product::find($state)->name ?? $state)
+                        DataColumn::make('product.name')
                             ->label('Product')
                             ->columnWidth('w-1/3'),
+
                         DataColumn::make('quantity')
                             ->label('Quantity')
                             ->columnWidth('w-1/3'),
+
                         DataColumn::make('price')
                             ->label('Price')
                             ->columnWidth('w-1/3'),

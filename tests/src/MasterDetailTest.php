@@ -8,7 +8,7 @@ use Filament\Forms\Form;
 use Illuminate\Contracts\View\View;
 use Rodrigofs\FilamentMasterdetail\Components\{DataColumn, Masterdetail};
 use Rodrigofs\FilamentMasterdetail\Tests\Fixtures\Livewire as LivewireFixtures;
-use Rodrigofs\FilamentMasterdetail\Tests\Models\{Order, OrderItem};
+use Rodrigofs\FilamentMasterdetail\Tests\Models\{Order, OrderItem, Product};
 use Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource\Pages\{CreateOrder, EditOrder};
 
 use function Pest\Livewire\livewire;
@@ -22,19 +22,22 @@ it('can create record master detail', function () {
 
     $order = Order::factory()->make();
 
+    $product1 = Product::factory()->create();
+    $product2 = Product::factory()->create();
+
     livewire(CreateOrder::class)
         ->fillForm([
             'customer_name' => $order->customer_name,
         ])
         ->callFormComponentAction(component: 'items', name: 'add', data: [
-            'product_id' => '23',
+            'product_id' => $product1->getKey(),
             'quantity' => 2,
-            'price' => 10.00,
+            'price' => $product1->price,
         ])
         ->callFormComponentAction(component: 'items', name: 'add', data: [
-            'product_id' => '24',
-            'quantity' => 1,
-            'price' => 20.00,
+            'product_id' => $product2->getKey(),
+            'quantity' => 3,
+            'price' => $product2->price,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -50,16 +53,16 @@ it('can create record master detail', function () {
 
     $this->assertDatabaseHas('order_items', [
         'order_id' => $storedPage->getKey(),
-        'product_id' => 23,
+        'product_id' => $product1->getKey(),
         'quantity' => 2,
-        'price' => 10.00,
+        'price' => $product1->price,
     ]);
 
     $this->assertDatabaseHas('order_items', [
         'order_id' => $storedPage->getKey(),
-        'product_id' => 24,
-        'quantity' => 1,
-        'price' => 20.00,
+        'product_id' => $product2->getKey(),
+        'quantity' => 3,
+        'price' => $product2->price,
     ]);
 });
 
@@ -86,6 +89,7 @@ it('can delete record detail', function () {
 
     $this->assertDatabaseCount('order_items', 2);
 });
+
 
 it('can set up a relationship without providing the name ', function () {
     expect(Masterdetail::make('test'))

@@ -31,6 +31,11 @@ trait HasRelationship
      */
     protected array $childRelated = [];
 
+    /**
+     * @var array<int, mixed>
+     */
+    protected array $showFields = [];
+
     protected ?Closure $mutateRelationshipDataBeforeCreateUsing = null;
 
     protected ?Closure $mutateRelationshipDataBeforeFillUsing = null;
@@ -54,7 +59,7 @@ trait HasRelationship
         });
 
         $this->saveRelationshipsUsing(static function (Masterdetail $component, HasForms $livewire, ?array $state) {
-            if (! is_array($state)) {
+            if (!is_array($state)) {
                 $state = [];
             }
 
@@ -104,6 +109,8 @@ trait HasRelationship
                     continue;
                 }
 
+                $itemData = $component->removeNestedArrays($itemData);
+
                 if ($translatableContentDriver) {
                     $record = $translatableContentDriver->makeRecord($relatedModel, $itemData);
                 } else {
@@ -121,6 +128,14 @@ trait HasRelationship
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    public function removeNestedArrays(array $data): array
+    {
+        return array_filter($data, fn ($value) => ! is_array($value));
+    }
     public function clearCachedExistingRecords(): void
     {
         $this->cachedExistingRecords = null;
@@ -134,12 +149,12 @@ trait HasRelationship
     }
 
     /**
-     * @param  Collection<string ,Model>  $records
+     * @param Collection<string ,Model> $records
      * @return array<array<string, mixed>>
      */
     protected function getStateFromRelatedRecords(Collection $records): array
     {
-        if (! $records->count()) {
+        if (!$records->count()) {
             return [];
         }
 
@@ -157,7 +172,7 @@ trait HasRelationship
     }
 
     /**
-     * @param  array<array<string, mixed>>  $data
+     * @param array<array<string, mixed>> $data
      * @return array<array<string, mixed>>
      */
     public function mutateRelationshipDataBeforeFill(array $data): array
@@ -179,7 +194,7 @@ trait HasRelationship
     }
 
     /**
-     * @param  array<array<string, mixed>>  $data
+     * @param array<array<string, mixed>> $data
      * @return array<array<string, mixed>> | null
      */
     public function mutateRelationshipDataBeforeCreate(array $data): ?array
@@ -201,7 +216,7 @@ trait HasRelationship
     }
 
     /**
-     * @param  array<array<string, mixed>>  $data
+     * @param array<array<string, mixed>> $data
      * @return array<array<string, mixed>> | null
      */
     public function mutateRelationshipDataBeforeSave(array $data, Model $record): ?array
@@ -234,7 +249,6 @@ trait HasRelationship
     {
         $state = $this->getState();
         $items = $this->hydratedDefaultState;
-
         foreach ($items as $itemKey => $itemData) {
             $items[$itemKey] = [
                 ...$state[$itemKey] ?? [],
@@ -260,8 +274,7 @@ trait HasRelationship
         $relationshipName = $this->getRelationshipName();
 
         if (
-            $this->getModelInstance()->relationLoaded($relationshipName) &&
-            (! $this->modifyRelationshipQueryUsing)
+            $this->getModelInstance()->relationLoaded($relationshipName) && (!$this->modifyRelationshipQueryUsing)
 
         ) {
             return $this->cachedExistingRecords = $this->getRecord()->getRelationValue($relationshipName)
@@ -274,8 +287,10 @@ trait HasRelationship
         $relationshipQuery = $relationship->getQuery();
 
         foreach ($this->getTableFields() as $field) {
-            if (is_null($field->getRelationship())) {
+            if (!is_null($field->getRelationship()) && !in_array($field->getRelationship(), $this->childRelated, true)) {
                 $this->childRelated[] = $field->getRelationship();
+            } elseif (is_null($field->getRelationship()) && $field->getRelationshipName()) {
+                $this->childRelated[] = $field->getRelationshipName();
             }
         }
 
@@ -307,10 +322,10 @@ trait HasRelationship
         );
     }
 
-    /** @phpstan-ignore-next-line  */
+    /** @phpstan-ignore-next-line */
     public function getRelationship(): HasOneOrMany | BelongsToMany | null
     {
-        if (! $this->hasRelationship()) {
+        if (!$this->hasRelationship()) {
             return null;
         }
 

@@ -22,6 +22,9 @@ trait HasFormModal
      */
     protected array | Closure $data = [];
 
+    /**
+     * @var string|Closure|null
+     */
     private string | Closure | null $unique = null;
 
     private ?Closure $beforeAddActionExecute = null;
@@ -59,7 +62,7 @@ trait HasFormModal
     }
 
     /**
-     * @param  list<string>  $formExceptClear
+     * @param list<string> $formExceptClear
      * @return $this
      */
     public function formExceptClear(array $formExceptClear = []): static
@@ -82,7 +85,7 @@ trait HasFormModal
             return false;
         }
 
-        return (bool) $this->evaluate($this->isAddable);
+        return (bool)$this->evaluate($this->isAddable);
     }
 
     public function getAddActionName(): string
@@ -105,7 +108,7 @@ trait HasFormModal
     }
 
     /**
-     * @param  array<string,mixed> | Closure  $data
+     * @param array<string,mixed> | Closure $data
      * @return $this
      */
     public function fillForm(array | Closure $data): static
@@ -118,6 +121,8 @@ trait HasFormModal
     public function getAddAction(): Action
     {
         $action = Action::make($this->getAddActionName())
+            ->component($this)
+            ->modal()
             ->modalSubmitActionLabel(fn (self $component) => $component->getModalSubmitActionLabel())
             ->modalCancelActionLabel(fn (self $component) => $component->getModalCancelActionLabel())
             ->closeModalByClickingAway(fn (self $component) => !$component->isModalClosedByClickingAway())
@@ -135,6 +140,7 @@ trait HasFormModal
             ->form($this->getSchema())
             ->fillForm($this->data)
             ->action(function (Action $action, Form $form, self $component, $data): void {
+
                 $uuid = $component->generateUuid();
 
                 $item = $component->getState();
@@ -145,9 +151,28 @@ trait HasFormModal
                     ]);
                 }
 
-                /** @var list<string> $item */
+                /** @var list<mixed> $item */
                 $item[$uuid] = $data;
 
+                foreach ($this->tableFields as $tableField) {
+                    if ($tableField->getRelationship() || $tableField->getRelationshipName()) {
+
+                        $relatedName = $tableField->getRelationship() ?? $tableField->getRelationshipName();
+                        $related = $component->getRelationship()->getRelated()->fill($data)->{$relatedName};
+
+                        if (is_null($related)) {
+                            continue;
+                        }
+
+                        $item[$uuid][$relatedName] = [
+                            $related->getKeyName() => $related->getKey(),
+                            $tableField->getRelationshipAttribute() => $related->{$tableField->getRelationshipAttribute()},
+                        ];
+
+                    }
+                }
+
+                /** @var array<string,mixed> $item */
                 $item = collect($item)->unique($this->evaluate($this->unique))->toArray();
 
                 $component->state($item);
