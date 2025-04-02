@@ -42,7 +42,7 @@ final class OrderResource extends Resource
                         TextInput::make('price')
                             ->label('Price'),
                     ])
-                    ->columns([
+                    ->table([
                         DataColumn::make('product.name')
                             ->label('Product')
                             ->columnWidth('w-1/3'),

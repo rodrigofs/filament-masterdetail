@@ -84,6 +84,8 @@ it('can delete record detail', function () {
         'item' => array_key_first($state),
     ])
         ->call('save')
+        ->assertSeeText($order->items[0]->product->name)
+        ->assertSeeText($order->items[1]->product->name)
         ->assertHasNoFormErrors();
 
 
