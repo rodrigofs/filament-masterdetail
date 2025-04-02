@@ -9,13 +9,12 @@ use Filament\Support\Components\Component;
 use Filament\Support\Concerns\{CanGrow, HasAlignment, HasCellState};
 use Filament\Support\Enums\Alignment;
 use Filament\Tables\Columns\Concerns\{BelongsToLayout,
-    CanFormatState,
     CanSpanColumns,
     HasLabel,
     HasName,
     HasRecord,
     HasRowLoopObject};
-use Rodrigofs\FilamentMasterdetail\Concerns\CanBeHidden;
+use Rodrigofs\FilamentMasterdetail\Concerns\{CanBeHidden, CanFormatState};
 
 final class DataColumn extends Component
 {
