@@ -7,12 +7,16 @@ namespace Rodrigofs\FilamentMasterdetail\Components;
 use Filament\Actions\Concerns\CanOpenModal;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Concerns\{CanBeAutofocused,
+    CanGenerateUuids,
+    CanLimitItemsLength,
+    HasHeaderActions as InteractsHeaderActions};
 use Filament\Forms\Components\Contracts\HasHeaderActions;
 use Filament\Support\Concerns\{HasDescription, HasHeading, HasIcon, HasIconColor};
-use Filament\Forms\Components\Concerns\{CanBeAutofocused, CanGenerateUuids, CanLimitItemsLength, HasHeaderActions as InteractsHeaderActions};
-use Rodrigofs\FilamentMasterdetail\Concerns\{CanDeleteAction, HasFormModal, HasRelationship, HasTable};
 use Filament\Tables\Columns\Concerns\HasName;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\{HtmlString, Str};
+use Rodrigofs\FilamentMasterdetail\Concerns\{CanDeleteAction, HasFormModal, HasRelationship, HasTable};
 
 final class Masterdetail extends Component implements HasHeaderActions
 {
@@ -93,5 +97,14 @@ final class Masterdetail extends Component implements HasHeaderActions
         $this->headerActions = [
             $this->getAddAction(),
         ];
+    }
+
+    public function getHeading(): string | Htmlable | null
+    {
+        if (is_null($this->heading)) {
+            $this->heading = new HtmlString('&nbsp;'); // workaround: force right alignment when title will be set to null
+        }
+
+        return $this->evaluate($this->heading);
     }
 }

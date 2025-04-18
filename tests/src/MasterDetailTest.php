@@ -131,6 +131,11 @@ it('can set the modal heading', function () {
         ->getModalHeading()->toBe('Test Title Modal');
 });
 
+it('can not set the heading', function () {
+    expect(Masterdetail::make(''))
+        ->getHeading()->toEqual('&nbsp;');
+});
+
 it('can modal persistent', function () {
     expect(Masterdetail::make(''))
         ->modalPersistent()
