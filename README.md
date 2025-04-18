@@ -272,10 +272,12 @@ use Rodrigofs\FilamentMasterDetail\Forms\Components\MasterDetail;
 
 MasterDetail::make('items')
     ->headerActions([
-        Action::make('clear')
-            ->label('Clear Items')
-            ->action(fn ($component) => $component->clear())
-            ->requiresConfirmation(),
+       Action::make('reset')
+            ->modalHeading('Are you sure?')
+            ->modalDescription('All existing items will be removed from the order.')
+            ->requiresConfirmation()
+            ->color('danger')
+            ->action(fn (Forms\Set $set) => $set('items', [])),
     ]);
 
 ```
@@ -310,10 +312,12 @@ MasterDetail::make('items')
     ->formExceptClear(['product_id'])
     ->beforeAddActionExecute(fn ($state, $set) => $set('product_id', $state))
     ->headerActions([
-        Action::make('clear')
-            ->label('Clear Items')
-            ->action(fn ($component) => $component->clear())
-            ->requiresConfirmation(),
+        Action::make('reset')
+            ->modalHeading('Are you sure?')
+            ->modalDescription('All existing items will be removed from the order.')
+            ->requiresConfirmation()
+            ->color('danger')
+            ->action(fn (Forms\Set $set) => $set('items', [])),
     ])
     ->slideOver();
 
