@@ -74,9 +74,9 @@ it('can delete record detail', function () {
 
     $component = livewire(EditOrder::class, [
         'record' => $order->getKey(),
-    ]);
+    ])->assertSuccessful();
 
-    $component->assertSuccessful();
+    $this->assertDatabaseCount('order_items', 3);
 
     $state = $component->get('data.items');
 
@@ -84,14 +84,44 @@ it('can delete record detail', function () {
         'item' => array_key_first($state),
     ])
         ->call('save')
-        ->assertSeeText($order->items[0]->product->name)
-        ->assertSeeText($order->items[1]->product->name)
+        ->assertSeeText(data_get($order->items, '0.product.name'))
+        ->assertSeeText(data_get($order->items, '1.product.name'))
         ->assertHasNoFormErrors();
 
 
     $this->assertDatabaseCount('order_items', 2);
 });
 
+it('can edit record detail', function () {
+    $order = Order::factory()
+        ->has(OrderItem::factory()->count(1), 'items')
+        ->create();
+
+    $component = livewire(EditOrder::class, [
+        'record' => $order->getKey(),
+    ])->assertSuccessful();
+
+    $state = $component->get('data.items');
+
+    $itemKey = array_key_first($state);
+
+    $component->callFormComponentAction(
+        component: 'items',
+        name: 'edit',
+        data: [
+            ...$state[$itemKey],
+            'quantity' => 19,
+        ],
+        arguments: ['item' => $itemKey],
+    )->call('save')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseCount('order_items', 1);
+    $this->assertDatabaseHas('order_items', [
+        'id' => $state[$itemKey]['id'],
+        'quantity' => 19,
+    ]);
+});
 
 it('can set up a relationship without providing the name ', function () {
     expect(Masterdetail::make('test'))
@@ -152,6 +182,12 @@ it('can set add label action', function () {
     expect(Masterdetail::make(''))
         ->addActionLabel('Test Add Label')
         ->getAddActionLabel()->toBe('Test Add Label');
+});
+
+it('can set edit label action', function () {
+    expect(Masterdetail::make(''))
+        ->editActionLabel('Test Edit Label')
+        ->getEditActionLabel()->toBe('Test Edit Label');
 });
 
 it('can set the modal description', function () {

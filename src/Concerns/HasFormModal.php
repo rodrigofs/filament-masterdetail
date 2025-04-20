@@ -9,6 +9,7 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
 use Illuminate\Support\Str;
+use Rodrigofs\FilamentMasterdetail\Components\Masterdetail;
 
 trait HasFormModal
 {
@@ -139,7 +140,7 @@ trait HasFormModal
             ->visible(fn (self $component): bool => $component->isAddable())
             ->form($this->getSchema())
             ->fillForm($this->data)
-            ->action(function (Action $action, Form $form, self $component, $data): void {
+            ->action(function (Action $action, Form $form, Masterdetail $component, $data): void {
 
                 $uuid = $component->generateUuid();
 
@@ -154,23 +155,8 @@ trait HasFormModal
                 /** @var list<mixed> $item */
                 $item[$uuid] = $data;
 
-                foreach ($this->tableFields as $tableField) {
-                    if ($tableField->getRelationship() || $tableField->getRelationshipName()) {
-
-                        $relatedName = $tableField->getRelationship() ?? $tableField->getRelationshipName();
-                        $related = $component->getRelationship()->getRelated()->fill($data)->{$relatedName};
-
-                        if (is_null($related)) {
-                            continue;
-                        }
-
-                        $item[$uuid][$relatedName] = [
-                            $related->getKeyName() => $related->getKey(),
-                            $tableField->getRelationshipAttribute() => $related->{$tableField->getRelationshipAttribute()},
-                        ];
-
-                    }
-                }
+                /** @var list<mixed> $item */
+                $item = $this->refreshRelationship($data, $item, $uuid);
 
                 /** @var array<string,mixed> $item */
                 $item = collect($item)->unique($this->evaluate($this->unique))->toArray();

@@ -16,13 +16,14 @@ use Filament\Support\Concerns\{HasDescription, HasHeading, HasIcon, HasIconColor
 use Filament\Tables\Columns\Concerns\HasName;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\{HtmlString, Str};
-use Rodrigofs\FilamentMasterdetail\Concerns\{CanDeleteAction, HasFormModal, HasRelationship, HasTable};
+use Rodrigofs\FilamentMasterdetail\Concerns\{CanDeleteAction, CanEditAction, HasFormModal, HasRelationship, HasTable};
 
 final class Masterdetail extends Component implements HasHeaderActions
 {
     use CanBeAutofocused;
     use CanOpenModal;
     use CanDeleteAction;
+    use CanEditAction;
     use CanGenerateUuids;
     use CanLimitItemsLength;
     use HasDescription;
@@ -92,6 +93,7 @@ final class Masterdetail extends Component implements HasHeaderActions
 
         $this->registerActions([
             fn (self $component): Action => $component->getDeleteAction(),
+            fn (self $component): Action => $component->getEditAction(),
         ]);
 
         $this->headerActions = [
@@ -106,5 +108,34 @@ final class Masterdetail extends Component implements HasHeaderActions
         }
 
         return $this->evaluate($this->heading);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param mixed $state
+     * @param string $itemKey
+     * @return array|mixed
+     */
+    public function refreshRelationship(array $data, mixed $state, string $itemKey): mixed
+    {
+        foreach ($this->tableFields as $tableField) {
+            if ($tableField->getRelationship() || $tableField->getRelationshipName()) {
+
+                $relatedName = $tableField->getRelationship() ?? $tableField->getRelationshipName();
+                $related = $this->getRelationship()->getRelated()->fill($data)->{$relatedName};
+
+                if (is_null($related)) {
+                    continue;
+                }
+
+                $state[$itemKey][$relatedName] = [
+                    $related->getKeyName() => $related->getKey(),
+                    $tableField->getRelationshipAttribute() => $related->{$tableField->getRelationshipAttribute()},
+                ];
+
+            }
+        }
+
+        return $state;
     }
 }
