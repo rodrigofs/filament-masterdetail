@@ -26,7 +26,7 @@
 - [Basic Usage](#basic-usage)
 - [Common Use Cases](#common-use-cases)
 - [Additional Features](#additional-features)
-    - [Behavior & Customization](#modal-behavior--customization)
+    - [Behavior & Customization](#behavior--customization)
         - [Disable Actions](#disable-actions)
         - [Slideover Mode](#slideover-mode)
         - [Set Custom Labels](#set-custom-labels)
@@ -37,16 +37,18 @@
         - [Manipulate Data Before Adding](#manipulate-data-before-adding)
         - [Add Header Actions](#add-header-actions)
 - [Full Example](#full-example)
+- [Editing Behavior](#editing-behavior)
 - [FAQ](#faq)
 - [Screenshots](#screenshots)
     - [Table View](#table-view)
-    - [Add New Item](#add-new-item)
-    - [Remove Item](#remove-item)
+    - [Add New Item](#add-new-item-in-modal)
+    - [Edit Item](#edit-item-in-modal)
+    - [Remove Item](#remove-item-with-confirmation)
     - [Slideover Mode](#show-slideover-mode)
     - [Video Demo](#video-demo)
 - [Changelog](#changelog)
 - [Contributing](#contributing)
-- [Security](#security)
+- [Security](#security-vulnerabilities)
 - [License](#license)
 
 ---
@@ -360,6 +362,14 @@ MasterDetail::make('items')
 
 ---
 
+## Editing Behavior
+
+The editing feature works for related records defined via the relationship() method on the component.
+
+>**Important**:
+>This feature does not support custom statePath-based implementations that do not use the relationship() method. Relationship-based binding is required for the edit action to resolve the model instance correctly.
+
+
 ## FAQ
 
 1. **Do I need to save the parent record before adding related records?**
@@ -392,7 +402,7 @@ MasterDetail::make('items')
 
 ![Remove Item](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/main/.github/resources/remove.png)
 
-### Slideover Mode
+### Show Slideover Mode
 
 ![Slideover Mode](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/main/.github/resources/slideover.png)
 
