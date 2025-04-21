@@ -3,12 +3,21 @@
 declare(strict_types=1);
 
 return [
-    'delete' => 'Delete',
-    'add' => 'Add',
+    'actions' => [
+        'delete' => 'Delete',
+        'add' => 'Add :label',
+        'edit' => 'Edit',
+    ],
     'modal' => [
-        'add' => 'Add',
-        'done' => 'Done',
-        'cancel' => 'Cancel',
+        'actions' => [
+            'add' => 'Add',
+            'edit' => 'Edit',
+            'cancel' => 'Cancel'
+        ],
+        'heading' => [
+            'add' => 'Adding :label',
+            'edit' => 'Editing :label',
+        ],
     ],
     'empty' => 'No records found.',
 ];

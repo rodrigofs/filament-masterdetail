@@ -16,7 +16,7 @@
 
 ## Overview
 
-**Filament Master Detail** is a dynamic management plugin for HasMany (1,n) relationships in FilamentPHP. It allows you to add and remove related records directly within the parent form, without the need to save the parent record first. Ideal for fast and fluid data entry scenarios.
+**Filament Master Detail** is a dynamic management ~~plugin~~ **Form Component** for HasMany (1,n) relationships in FilamentPHP. It allows you to add and remove related records directly within the parent form, without the need to save the parent record first. Ideal for fast and fluid data entry scenarios.
 
 ---
 
@@ -26,7 +26,8 @@
 - [Basic Usage](#basic-usage)
 - [Common Use Cases](#common-use-cases)
 - [Additional Features](#additional-features)
-    - [Modal Behavior & Customization](#modal-behavior--customization)
+    - [Behavior & Customization](#behavior--customization)
+        - [Disable Actions](#disable-actions)
         - [Slideover Mode](#slideover-mode)
         - [Set Custom Labels](#set-custom-labels)
         - [Set Modal Icon and Width](#set-modal-icon-and-width)
@@ -36,16 +37,18 @@
         - [Manipulate Data Before Adding](#manipulate-data-before-adding)
         - [Add Header Actions](#add-header-actions)
 - [Full Example](#full-example)
+- [Editing Behavior](#editing-behavior)
 - [FAQ](#faq)
 - [Screenshots](#screenshots)
     - [Table View](#table-view)
-    - [Add New Item](#add-new-item)
-    - [Remove Item](#remove-item)
+    - [Add New Item](#add-new-item-in-modal)
+    - [Edit Item](#edit-item-in-modal)
+    - [Remove Item](#remove-item-with-confirmation)
     - [Slideover Mode](#show-slideover-mode)
     - [Video Demo](#video-demo)
 - [Changelog](#changelog)
 - [Contributing](#contributing)
-- [Security](#security)
+- [Security](#security-vulnerabilities)
 - [License](#license)
 
 ---
@@ -139,21 +142,18 @@ MasterDetail::make('items')
     ->unique('shop_product_id')
     ->table([
         DataColumn::make('product.name')
-            ->label('Product')
-            ->columnWidth('w-1/3'),
+            ->relationship()
+            ->label('Product'),
 
         DataColumn::make('quantity')
-            ->label('Quantity')
-            ->columnWidth('w-1/3'),
+            ->label('Quantity'),
 
         DataColumn::make('price')
-            ->label('Unit Price')
-            ->columnWidth('w-1/3'),
+            ->label('Unit Price'),
 
         DataColumn::make('total')
             ->formatStateUsing(fn ($rowLoop) => $rowLoop->price * $rowLoop->quantity)
-            ->label('Total')
-            ->columnWidth('w-1/3'),
+            ->label('Total'),
     ]);
 ```
 
@@ -161,9 +161,35 @@ MasterDetail::make('items')
 
 ## Additional Features
 
-### Modal Behavior & Customization
+### Behavior & Customization
 
-You can customize the behavior and appearance of the modal used to add related records:
+You can customize the behavior of the component and the appearance and behavior of the modal used to add, delete, and edit related records:
+
+#### Disable Actions
+
+Disable the default Add, Delete, and Edit actions on the component:
+
+```php
+use Rodrigofs\FilamentMasterDetail\Components\MasterDetail;
+
+// Disable actions statically
+MasterDetail::make('items')
+    ->addable(false)
+    ->editable(false)
+    ->removable(false)
+    ->schema([
+        // Form fields
+    ]);
+
+// Disable actions conditionally using closures
+MasterDetail::make('items')
+    ->addable(fn (): bool => /* condition based on $record, $get, $state, $operation and more... */ false)
+    ->editable(fn (...): bool => /* condition based on $record, $get, $state, $operation and more... */ false)
+    ->removable(fn (...): bool => /* condition based on $record, $get, $state, $operation and more... */ false)
+    ->schema([
+        // Form fields
+    ]);
+```
 
 #### Slideover Mode
 
@@ -192,6 +218,7 @@ MasterDetail::make('items')
     ->modalHeading('Add Product')
     ->modalDescription('Include a new product in this order.')
     ->modalSubmitActionLabel('Add')
+    ->modalSubmitEditActionLabel('Edit')
     ->modalCancelActionLabel('Cancel');
 
 ```
@@ -282,6 +309,8 @@ MasterDetail::make('items')
 
 ```
 
+> _There are many additional features available—more than can be covered at once. While I will continue to document them, I encourage you to freely explore all possibilities. Don’t hesitate to open an issue if you encounter any problems or have suggestions._
+
 ---
 
 ## Full Example
@@ -300,6 +329,14 @@ MasterDetail::make('items')
         TextInput::make('quantity')
             ->numeric()
             ->required(),
+    ])
+    ->table([
+        DataColumn::make('product.name')
+            ->relationship()
+            ->label('Product'),
+        DataColumn::make('quantity')
+            ->label('Quantity'),
+ 
     ])
     ->addActionLabel('Add Product')
     ->modalHeading('Add Product')
@@ -325,6 +362,14 @@ MasterDetail::make('items')
 
 ---
 
+## Editing Behavior
+
+The editing feature works for related records defined via the relationship() method on the component.
+
+>**Important**:
+>This feature does not support custom statePath-based implementations that do not use the relationship() method. Relationship-based binding is required for the edit action to resolve the model instance correctly.
+
+
 ## FAQ
 
 1. **Do I need to save the parent record before adding related records?**
@@ -334,7 +379,8 @@ MasterDetail::make('items')
    *Currently, only HasMany relationships are supported.*
 
 3. **Is there support for editing related records?**
-   *No. Only adding and removing records is supported at the moment.*
+   ~~*No. Only adding and removing records is supported at the moment.*~~
+     *Yes. You can edit related records through an edit action.*
 
 ---
 
@@ -348,11 +394,15 @@ MasterDetail::make('items')
 
 ![Add New Item](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/main/.github/resources/add.png)
 
+### Edit Item in Modal
+
+![Edit Item](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/main/.github/resources/edit.png)
+
 ### Remove Item with Confirmation
 
 ![Remove Item](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/main/.github/resources/remove.png)
 
-### Slideover Mode
+### Show Slideover Mode
 
 ![Slideover Mode](https://raw.githubusercontent.com/rodrigofs/filament-masterdetail/main/.github/resources/slideover.png)
 

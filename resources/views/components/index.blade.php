@@ -12,6 +12,8 @@
     $deleteAction = $getAction($getDeleteActionName());
     $isAddable = $isAddable();
     $isDeletable = $isDeletable();
+    $isEditable = $isEditable();
+    $editAction = $getAction($getEditActionName());
     $statePath = $getStatePath();
     $hasActions =  $deleteAction->isVisible();
     $headerActions = $getHeaderActions();
@@ -88,10 +90,22 @@
                 @endforeach
 
                 <td class="px-3 py-2 whitespace-nowrap text-sm">
-                    @if ($isDeletable)
-                        {{ $deleteAction(['item' => $uuid]) }}
-                    @endif
+                    <div class="flex items-center justify-center gap-3">
+                        @if ($isEditable)
+                            {{ $editAction(['item' => $uuid]) }}
+                        @endif
+
+                        @if ($isDeletable)
+                            {{ $deleteAction(['item' => $uuid]) }}
+                        @endif
+                    </div>
                 </td>
+
+                {{--                <td class="px-3 py-2 whitespace-nowrap text-sm">--}}
+                {{--                    @if ($isEditable)--}}
+                {{--                        {{ $editAction(['item' => $uuid]) }}--}}
+                {{--                    @endif--}}
+                {{--                </td>--}}
 
             </tr>
         @empty

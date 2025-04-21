@@ -8,7 +8,7 @@ use Closure;
 use Filament\Forms\Contracts\HasForms;
 use Illuminate\Database\Eloquent\{Builder, Collection, Model};
 use Illuminate\Database\Eloquent\Relations\{BelongsToMany, HasOneOrMany};
-use Rodrigofs\FilamentMasterdetail\Components\Masterdetail;
+use Rodrigofs\FilamentMasterdetail\Components\{DataColumn, Masterdetail};
 
 trait HasRelationship
 {
@@ -58,69 +58,76 @@ trait HasRelationship
             $component->fillFromRelationship();
         });
 
-        $this->saveRelationshipsUsing(static function (Masterdetail $component, HasForms $livewire, ?array $state) {
-            if (!is_array($state)) {
-                $state = [];
-            }
-
+        $this->saveRelationshipsUsing(static function (
+            Masterdetail $component,
+            HasForms     $livewire,
+            ?array       $state,
+        ) {
+            $items = is_array($state) ? $state : [];
             $relationship = $component->getRelationship();
+            $relatedModel = $relationship->getRelated();
+            $primaryKey = $relatedModel->getKeyName();
+            $existing = $component->getCachedExistingRecords();
 
-            $existingRecords = $component->getCachedExistingRecords();
+            $incomingIds = collect($items)
+                ->pluck($primaryKey)
+                ->filter()
+                ->all();
 
-            $recordsToDelete = [];
+            $toDelete = array_diff(
+                $existing->keys()->all(),
+                array_map(fn ($id) => "record-{$id}", $incomingIds),
+            );
 
-            foreach ($existingRecords->pluck($relationship->getRelated()->getKeyName()) as $keyToCheckForDeletion) {
-                if (array_key_exists("record-{$keyToCheckForDeletion}", $state)) {
-                    continue;
-                }
+            $toDeleteIds = array_map(
+                fn (string $hash) => (int)str_replace('record-', '', $hash),
+                $toDelete,
+            );
 
-                $recordsToDelete[] = $keyToCheckForDeletion;
+            if (!empty($toDeleteIds)) {
+                $relationship
+                    ->whereKey($toDeleteIds)
+                    ->each(fn (Model $r) => $r->delete());
             }
-
-            $relationship
-                ->whereKey($recordsToDelete)
-                ->get()
-                ->each(static fn (Model $record) => $record->delete());
 
             $translatableContentDriver = $livewire->makeFilamentTranslatableContentDriver();
 
-            foreach ($state as $itemKey => $item) {
-                $itemData = $item;
+            foreach ($items as $itemData) {
+                $id = $itemData[$primaryKey] ?? null;
+                $recordKey = $id !== null ? "record-{$id}" : null;
 
-                if ($record = ($existingRecords[$itemKey] ?? null)) {
-                    $itemData = $component->mutateRelationshipDataBeforeSave($itemData, record: $record);
+                if ($recordKey !== null && isset($existing[$recordKey])) {
+                    $record = $existing[$recordKey];
 
-                    if ($itemData === null) {
-                        continue;
+                    $data = $component->mutateRelationshipDataBeforeSave($itemData, record: $record);
+                    if ($data !== null) {
+                        $component->clearRelationAttributes($record);
+                        $data = $component->removeNestedArrays($data);
+
+                        $translatableContentDriver ?
+                            $translatableContentDriver->updateRecord($record, $data) :
+                            $record->fill($data)->save();
                     }
 
-                    $translatableContentDriver ?
-                        $translatableContentDriver->updateRecord($record, $itemData) :
-                        $record->fill($itemData)->save();
-
                     continue;
                 }
 
-                $relatedModel = $component->getRelatedModel();
-
-                $itemData = $component->mutateRelationshipDataBeforeCreate($itemData);
-
-                if ($itemData === null) {
+                $data = $component->mutateRelationshipDataBeforeCreate($itemData);
+                if ($data === null) {
                     continue;
                 }
 
-                $itemData = $component->removeNestedArrays($itemData);
-
+                $data = $component->removeNestedArrays($data);
                 if ($translatableContentDriver) {
-                    $record = $translatableContentDriver->makeRecord($relatedModel, $itemData);
+                    $record = $translatableContentDriver->makeRecord($component->getRelatedModel(), $data);
                 } else {
                     $record = new $relatedModel();
-                    $record->fill($itemData);
+                    $record->fill($data);
                 }
 
+                $component->clearRelationAttributes($record);
                 $relationship->save($record);
             }
-
         });
 
         $this->dehydrated(false);
@@ -134,8 +141,9 @@ trait HasRelationship
      */
     public function removeNestedArrays(array $data): array
     {
-        return array_filter($data, fn ($value) => ! is_array($value));
+        return array_filter($data, fn ($value) => !is_array($value));
     }
+
     public function clearCachedExistingRecords(): void
     {
         $this->cachedExistingRecords = null;
@@ -238,12 +246,12 @@ trait HasRelationship
         return $data;
     }
 
-    //    public function mutateRelationshipDataBeforeSaveUsing(?Closure $callback): static
-    //    {
-    //        $this->mutateRelationshipDataBeforeSaveUsing = $callback;
-    //
-    //        return $this;
-    //    }
+    public function mutateRelationshipDataBeforeSaveUsing(?Closure $callback): static
+    {
+        $this->mutateRelationshipDataBeforeSaveUsing = $callback;
+
+        return $this;
+    }
 
     protected function mergeHydratedDefaultStateWithChildComponentContainerState(): void
     {
@@ -269,57 +277,76 @@ trait HasRelationship
         }
 
         $relationship = $this->getRelationship();
-        $relatedKeyName = $relationship->getRelated()->getKeyName();
-
-        $relationshipName = $this->getRelationshipName();
+        $relatedName = $relationship->getRelated()->getKeyName();
+        $relationName = $this->getRelationshipName();
 
         if (
-            $this->getModelInstance()->relationLoaded($relationshipName) && (!$this->modifyRelationshipQueryUsing)
+            $this->getModelInstance()->relationLoaded($relationName) && (!$this->modifyRelationshipQueryUsing)
 
         ) {
-            return $this->cachedExistingRecords = $this->getRecord()->getRelationValue($relationshipName)
+            return $this->cachedExistingRecords = $this
+                ->getRecord()
+                ->getRelationValue($relationName)
                 ->mapWithKeys(
-                    fn (Model $item): array => ["record-{$item[$relatedKeyName]}" => $item],
+                    fn (Model $item): array => ["record-{$item[$relatedName]}" => $item],
                 );
         }
 
-        /** @var Builder<Model> $relationshipQuery */
-        $relationshipQuery = $relationship->getQuery();
+        /** @var Builder<Model> $query */
+        $query = $relationship->getQuery();
 
-        foreach ($this->getTableFields() as $field) {
-            if (!is_null($field->getRelationship()) && !in_array($field->getRelationship(), $this->childRelated, true)) {
-                $this->childRelated[] = $field->getRelationship();
-            } elseif (is_null($field->getRelationship()) && $field->getRelationshipName()) {
-                $this->childRelated[] = $field->getRelationshipName();
-            }
-        }
+        $fields = $this->getTableFields();
 
-        if (count($this->childRelated) > 0) {
-            $relationshipQuery->with($this->childRelated);
+        // TODO: check implementation feasibility to optimize relationship loading, bringing only the key field and the label field.
+        $eagerLoads = collect($fields)
+            ->map(function (DataColumn $f) {
+                if (!$f->getRelationship() && !$f->getRelationshipName()) {
+                    return null;
+                }
+
+                return $f->getRelationship() ?: $f->getRelationshipName();
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (!empty($eagerLoads)) {
+            $query->with($eagerLoads);
         }
 
         if ($relationship instanceof BelongsToMany) {
-            $relationshipQuery->select([
-                $relationship->getTable() . '.*',
-                $relationshipQuery->getModel()->getTable() . '.*',
+            $query->select([
+                "{$relationship->getTable()}.*",
+                "{$query->getModel()->getTable()}.*",
             ]);
         }
 
         if ($this->modifyRelationshipQueryUsing) {
-            $relationshipQuery = $this->evaluate($this->modifyRelationshipQueryUsing, [
-                'query' => $relationshipQuery,
-            ]) ?? $relationshipQuery;
+            $query = $this->evaluate($this->modifyRelationshipQueryUsing, [
+                'query' => $query,
+            ]) ?? $query;
         }
 
-        return $this->cachedExistingRecords = $relationshipQuery->get()->mapWithKeys(
-            function (Model $item) use ($relatedKeyName): array {
-                foreach ($item->getRelations() as $relationName => $relation) {
-                    $item->setAttribute($relationName, $relation->toArray());
-                }
+        return $this->cachedExistingRecords = $query
+            ->get()
+            ->mapWithKeys(
+                function (Model $item) use ($relatedName): array {
+                    foreach ($item->getRelations() as $relationName => $relation) {
+                        $item->setAttribute($relationName, $relation->toArray());
+                    }
 
-                return ["record-{$item[$relatedKeyName]}" => $item];
-            },
-        );
+                    return ["record-$item[$relatedName]" => $item];
+                },
+            );
+    }
+
+    protected function clearRelationAttributes(Model $model): void
+    {
+        foreach ($model->getRelations() as $relationName => $_) {
+            $model->unsetRelation($relationName);
+            unset($model[$relationName]);
+        }
     }
 
     /** @phpstan-ignore-next-line */

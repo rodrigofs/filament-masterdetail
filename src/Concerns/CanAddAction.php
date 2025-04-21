@@ -9,8 +9,9 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
 use Illuminate\Support\Str;
+use Rodrigofs\FilamentMasterdetail\Components\Masterdetail;
 
-trait HasFormModal
+trait CanAddAction
 {
     /**
      * @var array<Component>|Closure
@@ -122,8 +123,17 @@ trait HasFormModal
     {
         $action = Action::make($this->getAddActionName())
             ->component($this)
+            ->modalIcon(fn (self $component) => $component->getModalIcon())
             ->modal()
-            ->modalSubmitActionLabel(fn (self $component) => $component->getModalSubmitActionLabel())
+            ->modalHeading(__('filament-masterdetail::masterdetail.modal.heading.add', [
+                'label' => $this->getModalHeading()
+            ]))
+            ->modalSubmitActionLabel(fn (self $component) => __('filament-masterdetail::masterdetail.modal.actions.add', [
+                'label' => Str::lcfirst($component->getModalSubmitActionLabel()),
+            ]))
+            ->label(fn (self $component): string => __('filament-masterdetail::masterdetail.actions.add', [
+                'label' => Str::lcfirst($this->getAddActionLabel()),
+            ]))
             ->modalCancelActionLabel(fn (self $component) => $component->getModalCancelActionLabel())
             ->closeModalByClickingAway(fn (self $component) => !$component->isModalClosedByClickingAway())
             ->slideOver(fn (self $component) => $component->isModalSlideOver())
@@ -133,13 +143,10 @@ trait HasFormModal
             ->modalDescription(fn (self $component) => $component->getModalDescription())
             ->stickyModalHeader(fn (self $component) => $component->isModalHeaderSticky())
             ->stickyModalFooter(fn (self $component) => $component->isModalFooterSticky())
-            ->modalIcon(fn (self $component) => $component->getModalIcon())
-            ->modalHeading(fn (self $component) => $component->getModalHeading())
-            ->label(fn (self $component): string => $component->getLabel() ?? $component->getAddActionLabel())
             ->visible(fn (self $component): bool => $component->isAddable())
             ->form($this->getSchema())
             ->fillForm($this->data)
-            ->action(function (Action $action, Form $form, self $component, $data): void {
+            ->action(function (Action $action, Form $form, Masterdetail $component, $data): void {
 
                 $uuid = $component->generateUuid();
 
@@ -154,23 +161,8 @@ trait HasFormModal
                 /** @var list<mixed> $item */
                 $item[$uuid] = $data;
 
-                foreach ($this->tableFields as $tableField) {
-                    if ($tableField->getRelationship() || $tableField->getRelationshipName()) {
-
-                        $relatedName = $tableField->getRelationship() ?? $tableField->getRelationshipName();
-                        $related = $component->getRelationship()->getRelated()->fill($data)->{$relatedName};
-
-                        if (is_null($related)) {
-                            continue;
-                        }
-
-                        $item[$uuid][$relatedName] = [
-                            $related->getKeyName() => $related->getKey(),
-                            $tableField->getRelationshipAttribute() => $related->{$tableField->getRelationshipAttribute()},
-                        ];
-
-                    }
-                }
+                /** @var list<mixed> $item */
+                $item = $this->refreshRelationship($data, $item, $uuid);
 
                 /** @var array<string,mixed> $item */
                 $item = collect($item)->unique($this->evaluate($this->unique))->toArray();
@@ -193,17 +185,15 @@ trait HasFormModal
             ->button();
 
         if ($this->modalPersistent) {
-            $action->modalCancelActionLabel(__('filament-masterdetail::masterdetail.modal.done'));
+            $action->modalCancelActionLabel(__('filament-masterdetail::masterdetail.modal.actions.cancel'));
         }
 
         return $action;
     }
 
-    public function getAddActionLabel(): string
+    public function getAddActionLabel(): ?string
     {
-        return $this->evaluate($this->addActionLabel) ?? __('filament-masterdetail::masterdetail.add', [
-            'label' => Str::lcfirst($this->getLabel()),
-        ]);
+        return $this->evaluate($this->addActionLabel);
     }
 
     public function isModalPersistent(): bool

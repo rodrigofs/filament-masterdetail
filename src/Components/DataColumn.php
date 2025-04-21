@@ -36,6 +36,8 @@ final class DataColumn extends Component
 
     protected string | Closure | null $relationship = null;
 
+    protected string | Closure $ownerKey = 'id';
+
     protected mixed $getStateUsing = null;
 
     final public function __construct(string $name)
@@ -59,6 +61,13 @@ final class DataColumn extends Component
         return $this;
     }
 
+    //    public function ownerKey(string | Closure $ownerKey): static
+    //    {
+    //        $this->ownerKey = $ownerKey;
+    //
+    //        return $this;
+    //    }
+
     public function columnWidth(string | Closure $width): static
     {
         $this->columnWidth = $width;
@@ -77,6 +86,11 @@ final class DataColumn extends Component
     {
         return $this->evaluate($this->relationship);
     }
+
+    //    public function getOwnerKey(): ?string
+    //    {
+    //        return $this->evaluate($this->ownerKey);
+    //    }
 
     public function getState(): mixed
     {
