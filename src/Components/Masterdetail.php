@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rodrigofs\FilamentMasterdetail\Components;
 
+use Closure;
 use Filament\Actions\Concerns\CanOpenModal;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
@@ -16,7 +17,7 @@ use Filament\Support\Concerns\{HasDescription, HasHeading, HasIcon, HasIconColor
 use Filament\Tables\Columns\Concerns\HasName;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\{HtmlString, Str};
-use Rodrigofs\FilamentMasterdetail\Concerns\{CanDeleteAction, CanEditAction, HasFormModal, HasRelationship, HasTable};
+use Rodrigofs\FilamentMasterdetail\Concerns\{CanDeleteAction, CanEditAction, CanAddAction, HasRelationship, HasTable};
 
 final class Masterdetail extends Component implements HasHeaderActions
 {
@@ -27,7 +28,7 @@ final class Masterdetail extends Component implements HasHeaderActions
     use CanGenerateUuids;
     use CanLimitItemsLength;
     use HasDescription;
-    use HasFormModal;
+    use CanAddAction;
     use HasHeading;
     use HasIcon;
     use HasIconColor;
@@ -43,6 +44,11 @@ final class Masterdetail extends Component implements HasHeaderActions
         $this->defaultView(fn () => 'filament-masterdetail::components.index');
         $this->name($name);
         $this->statePath($name);
+    }
+
+    public function label(Htmlable | Closure | string | null $label): static
+    {
+        return $this->addActionLabel($label);
     }
 
     public static function make(string $name): Masterdetail

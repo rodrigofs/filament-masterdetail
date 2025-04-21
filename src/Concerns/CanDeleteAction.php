@@ -7,7 +7,6 @@ namespace Rodrigofs\FilamentMasterdetail\Concerns;
 use Closure;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Support\Enums\{ActionSize, IconSize};
-use Filament\Support\Facades\FilamentIcon;
 use Rodrigofs\FilamentMasterdetail\Components\Masterdetail;
 
 trait CanDeleteAction
@@ -19,8 +18,8 @@ trait CanDeleteAction
     public function getDeleteAction(): Action
     {
         $action = Action::make($this->getDeleteActionName())
-            ->label(__('filament-masterdetail::masterdetail.delete'))
-            ->icon(FilamentIcon::resolve('forms::components.repeater.actions.delete') ?? 'heroicon-m-trash')
+            ->label(__('filament-masterdetail::masterdetail.actions.delete'))
+            ->icon('heroicon-m-trash')
             ->iconSize(IconSize::Small)
             ->color('danger')
             ->action(function (array $arguments, Masterdetail $component, $state): void {

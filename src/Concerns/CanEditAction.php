@@ -27,12 +27,19 @@ trait CanEditAction
             ->component($this)
             ->icon('heroicon-o-pencil-square')
             ->iconSize(IconSize::Small)
-            ->modalSubmitActionLabel(fn (self $component) => $component->getModalSubmitEditActionLabel())
-            ->label(fn (self $component): string => $component->getLabel() ?? $component->getEditActionLabel())
+            ->modalHeading(__('filament-masterdetail::masterdetail.modal.heading.edit', [
+                'label' => $this->getModalHeading()
+            ]))
+            ->modalSubmitActionLabel(fn (self $component) => __('filament-masterdetail::masterdetail.modal.actions.edit', [
+                'label' => Str::lcfirst($component->getModalSubmitEditActionLabel()),
+            ]))
+            ->label(fn (self $component): string => __('filament-masterdetail::masterdetail.actions.edit', [
+                'label' => Str::lcfirst($this->getEditActionLabel()),
+            ]))
             ->fillForm(function (array $arguments) {
                 $itemKey = data_get($arguments, 'item');
 
-                if (! is_string($itemKey)) {
+                if (!is_string($itemKey)) {
                     return [];
                 }
 
@@ -40,7 +47,7 @@ trait CanEditAction
 
                 $itemState = data_get($state, $itemKey);
 
-                if (! is_array($itemState)) {
+                if (!is_array($itemState)) {
                     return [];
                 }
 
@@ -49,7 +56,7 @@ trait CanEditAction
             ->action(function (array $arguments, Action $action, Form $form, Masterdetail $component, $data): void {
                 $itemKey = data_get($arguments, 'item');
 
-                if (! is_string($itemKey)) {
+                if (!is_string($itemKey)) {
                     return;
                 }
 
@@ -57,7 +64,7 @@ trait CanEditAction
 
                 $currentItemState = Arr::get($state, $itemKey, []);
 
-                if (! is_array($currentItemState)) {
+                if (!is_array($currentItemState)) {
                     return;
                 }
 
@@ -72,7 +79,7 @@ trait CanEditAction
             ->iconButton();
 
         if ($this->modalPersistent) {
-            $action->modalCancelActionLabel(__('filament-masterdetail::masterdetail.modal.done'));
+            $action->modalCancelActionLabel(__('filament-masterdetail::masterdetail.modal.actions.cancel'));
         }
 
         return $action;
@@ -97,12 +104,11 @@ trait CanEditAction
         return 'edit';
     }
 
-    public function getEditActionLabel(): string
+    public function getEditActionLabel(): ?string
     {
-        return $this->evaluate($this->editActionLabel) ?? __('filament-masterdetail::masterdetail.edit', [
-            'label' => Str::lcfirst($this->getLabel()),
-        ]);
+        return $this->evaluate($this->editActionLabel);
     }
+
     public function isEditable(): bool
     {
         if ($this->isDisabled()) {
@@ -126,8 +132,8 @@ trait CanEditAction
         return $this;
     }
 
-    public function getModalSubmitEditActionLabel(): string
+    public function getModalSubmitEditActionLabel(): ?string
     {
-        return $this->evaluate($this->modalSubmitEditActionLabel) ?? __('filament-masterdetail::masterdetail.modal.edit');
+        return $this->evaluate($this->modalSubmitEditActionLabel);
     }
 }

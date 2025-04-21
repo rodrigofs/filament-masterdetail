@@ -11,22 +11,22 @@ use Filament\Forms\Form;
 use Illuminate\Support\Str;
 use Rodrigofs\FilamentMasterdetail\Components\Masterdetail;
 
-trait HasFormModal
+trait CanAddAction
 {
     /**
      * @var array<Component>|Closure
      */
-    protected array|Closure $schema = [];
+    protected array | Closure $schema = [];
 
     /**
      * @var array<string,mixed>|Closure
      */
-    protected array|Closure $data = [];
+    protected array | Closure $data = [];
 
     /**
      * @var string|Closure|null
      */
-    private string|Closure|null $unique = null;
+    private string | Closure | null $unique = null;
 
     private ?Closure $beforeAddActionExecute = null;
 
@@ -37,11 +37,11 @@ trait HasFormModal
 
     private bool $modalPersistent = false;
 
-    protected bool|Closure $isAddable = true;
+    protected bool | Closure $isAddable = true;
 
-    protected string|Closure|null $addActionLabel = null;
+    protected string | Closure | null $addActionLabel = null;
 
-    public function schema(Closure|array $schema): static
+    public function schema(Closure | array $schema): static
     {
         $this->schema = $schema;
 
@@ -73,7 +73,7 @@ trait HasFormModal
         return $this;
     }
 
-    public function unique(string|Closure|null $unique): static
+    public function unique(string | Closure | null $unique): static
     {
         $this->unique = $unique;
 
@@ -94,14 +94,14 @@ trait HasFormModal
         return 'add';
     }
 
-    public function addable(bool|Closure $condition = true): static
+    public function addable(bool | Closure $condition = true): static
     {
         $this->isAddable = $condition;
 
         return $this;
     }
 
-    public function addActionLabel(string|Closure|null $label): static
+    public function addActionLabel(string | Closure | null $label): static
     {
         $this->addActionLabel = $label;
 
@@ -112,7 +112,7 @@ trait HasFormModal
      * @param array<string,mixed> | Closure $data
      * @return $this
      */
-    public function fillForm(array|Closure $data): static
+    public function fillForm(array | Closure $data): static
     {
         $this->data = $data;
 
@@ -123,21 +123,27 @@ trait HasFormModal
     {
         $action = Action::make($this->getAddActionName())
             ->component($this)
+            ->modalIcon(fn (self $component) => $component->getModalIcon())
             ->modal()
-            ->modalSubmitActionLabel(fn(self $component) => $component->getModalSubmitActionLabel())
-            ->modalCancelActionLabel(fn(self $component) => $component->getModalCancelActionLabel())
-            ->closeModalByClickingAway(fn(self $component) => !$component->isModalClosedByClickingAway())
-            ->slideOver(fn(self $component) => $component->isModalSlideOver())
-            ->modalWidth(fn(self $component) => $component->getModalWidth())
-            ->modalAlignment(fn(self $component) => $component->getModalAlignment())
-            ->modalAutofocus(fn(self $component) => $component->isModalAutofocused())
-            ->modalDescription(fn(self $component) => $component->getModalDescription())
-            ->stickyModalHeader(fn(self $component) => $component->isModalHeaderSticky())
-            ->stickyModalFooter(fn(self $component) => $component->isModalFooterSticky())
-            ->modalIcon(fn(self $component) => $component->getModalIcon())
-            ->modalHeading(fn(self $component) => __('filament-masterdetail::masterdetail.modal.add') . ' ' . $component->getModalHeading())
-            ->label(fn(self $component): string => $component->getLabel() ?? $component->getAddActionLabel())
-            ->visible(fn(self $component): bool => $component->isAddable())
+            ->modalHeading(__('filament-masterdetail::masterdetail.modal.heading.add', [
+                'label' => $this->getModalHeading()
+            ]))
+            ->modalSubmitActionLabel(fn (self $component) => __('filament-masterdetail::masterdetail.modal.actions.add', [
+                'label' => Str::lcfirst($component->getModalSubmitActionLabel()),
+            ]))
+            ->label(fn (self $component): string => __('filament-masterdetail::masterdetail.actions.add', [
+                'label' => Str::lcfirst($this->getAddActionLabel()),
+            ]))
+            ->modalCancelActionLabel(fn (self $component) => $component->getModalCancelActionLabel())
+            ->closeModalByClickingAway(fn (self $component) => !$component->isModalClosedByClickingAway())
+            ->slideOver(fn (self $component) => $component->isModalSlideOver())
+            ->modalWidth(fn (self $component) => $component->getModalWidth())
+            ->modalAlignment(fn (self $component) => $component->getModalAlignment())
+            ->modalAutofocus(fn (self $component) => $component->isModalAutofocused())
+            ->modalDescription(fn (self $component) => $component->getModalDescription())
+            ->stickyModalHeader(fn (self $component) => $component->isModalHeaderSticky())
+            ->stickyModalFooter(fn (self $component) => $component->isModalFooterSticky())
+            ->visible(fn (self $component): bool => $component->isAddable())
             ->form($this->getSchema())
             ->fillForm($this->data)
             ->action(function (Action $action, Form $form, Masterdetail $component, $data): void {
@@ -165,7 +171,7 @@ trait HasFormModal
 
                 $component->callAfterStateUpdated();
 
-                $exceptClear = collect($this->formExceptClear)->mapWithKeys(fn($item) => [$item => $data[$item]])->toArray();
+                $exceptClear = collect($this->formExceptClear)->mapWithKeys(fn ($item) => [$item => $data[$item]])->toArray();
 
                 if ($component->modalPersistent) {
                     $form->fill([
@@ -179,17 +185,15 @@ trait HasFormModal
             ->button();
 
         if ($this->modalPersistent) {
-            $action->modalCancelActionLabel(__('filament-masterdetail::masterdetail.modal.done'));
+            $action->modalCancelActionLabel(__('filament-masterdetail::masterdetail.modal.actions.cancel'));
         }
 
         return $action;
     }
 
-    public function getAddActionLabel(): string
+    public function getAddActionLabel(): ?string
     {
-        return $this->evaluate($this->addActionLabel) ?? __('filament-masterdetail::masterdetail.add', [
-            'label' => Str::lcfirst($this->getLabel()),
-        ]);
+        return $this->evaluate($this->addActionLabel);
     }
 
     public function isModalPersistent(): bool
@@ -200,8 +204,8 @@ trait HasFormModal
     /**
      * @return array<Component> | Closure
      */
-    private function getSchema(): Closure|array
+    private function getSchema(): Closure | array
     {
-        return fn() => $this->evaluate($this->schema);
+        return fn () => $this->evaluate($this->schema);
     }
 }
