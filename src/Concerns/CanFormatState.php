@@ -99,56 +99,6 @@ trait CanFormatState
         return $this;
     }
 
-    //    public function dateTooltip(string | Closure | null $format = null, ?string $timezone = null): static
-    //    {
-    //        $format ??= Table::$defaultDateDisplayFormat;
-    //
-    //        $this->tooltip(static function (DataColumn $column, mixed $state) use ($format, $timezone): ?string {
-    //            if (blank($state)) {
-    //                return null;
-    //            }
-    //
-    //            return Carbon::parse($state)
-    //                ->setTimezone($timezone ?? $column->getTimezone())
-    //                ->translatedFormat($column->evaluate($format));
-    //        });
-    //
-    //        return $this;
-    //    }
-
-    //    public function dateTimeTooltip(string | Closure | null $format = null, ?string $timezone = null): static
-    //    {
-    //        $format ??= Table::$defaultDateTimeDisplayFormat;
-    //
-    //        $this->dateTooltip($format, $timezone);
-    //
-    //        return $this;
-    //    }
-
-    //    public function timeTooltip(string | Closure | null $format = null, ?string $timezone = null): static
-    //    {
-    //        $format ??= Table::$defaultTimeDisplayFormat;
-    //
-    //        $this->dateTooltip($format, $timezone);
-    //
-    //        return $this;
-    //    }
-
-    //    public function sinceTooltip(?string $timezone = null): static
-    //    {
-    //        $this->tooltip(static function (DataColumn $column, mixed $state) use ($timezone): ?string {
-    //            if (blank($state)) {
-    //                return null;
-    //            }
-    //
-    //            return Carbon::parse($state)
-    //                ->setTimezone($timezone ?? $column->getTimezone())
-    //                ->diffForHumans();
-    //        });
-    //
-    //        return $this;
-    //    }
-
     public function money(string | Closure | null $currency = null, int $divideBy = 0, string | Closure | null $locale = null): static
     {
         $this->isMoney = true;
@@ -283,7 +233,7 @@ trait CanFormatState
         ]);
 
         if ($isHtml) {
-            $state = Str::sanitizeHtml($state);
+            $state = Str::sanitizeHtml($state ?? '');
         }
 
         if ($state instanceof Htmlable) {
