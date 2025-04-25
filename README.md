@@ -16,7 +16,7 @@
 
 ## Overview
 
-**Filament Master Detail** is a dynamic management ~~plugin~~ **Form Component** for HasMany (1,n) relationships in FilamentPHP. It allows you to add and remove related records directly within the parent form, without the need to save the parent record first. Ideal for fast and fluid data entry scenarios.
+**Filament Master Detail** is a dynamic management ~~plugin~~ **Form Component** for HasMany (1,n) and Many to Many(n,n) relationships in FilamentPHP. It allows you to add and remove related records directly within the parent form, without the need to save the parent record first. Ideal for fast and fluid data entry scenarios.
 
 ---
 
@@ -376,9 +376,10 @@ The editing feature works for related records defined via the relationship() met
    *No. MasterDetail allows adding and removing related records before persisting the parent model.*
 
 2. **Does it support other relationship types besides HasMany?**
-   *Currently, only HasMany relationships are supported.*
+  ~~*Currently, only HasMany relationships are supported.~~*
+   *Yes. In addition to HasMany, it is now possible to create records using BelongsToMany (many-to-many) relationships. However, attaching existing related records is not yet supported.*
 
-3. **Is there support for editing related records?**
+4. **Is there support for editing related records?**
    ~~*No. Only adding and removing records is supported at the moment.*~~
      *Yes. You can edit related records through an edit action.*
 
