@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Rodrigofs\FilamentMasterdetail\Tests\Resources;
 
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\{KeyValue, TextInput};
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\{BulkActionGroup, CreateAction, DeleteBulkAction, EditAction};
@@ -41,19 +41,24 @@ final class OrderResource extends Resource
                             ->label('Quantity'),
                         TextInput::make('price')
                             ->label('Price'),
+                        KeyValue::make('characteristics')
+                            ->label('Characteristics')
+                            ->schema([
+                                TextInput::make('color')
+                                    ->label('Color'),
+                                TextInput::make('size')
+                                    ->label('Size'),
+                            ]),
                     ])
                     ->table([
                         DataColumn::make('product.name')
-                            ->label('Product')
-                            ->columnWidth('w-1/3'),
+                            ->label('Product'),
 
                         DataColumn::make('quantity')
-                            ->label('Quantity')
-                            ->columnWidth('w-1/3'),
+                            ->label('Quantity'),
 
                         DataColumn::make('price')
-                            ->label('Price')
-                            ->columnWidth('w-1/3'),
+                            ->label('Price'),
                     ]),
             ])->columns(1);
     }

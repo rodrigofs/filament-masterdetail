@@ -14,11 +14,13 @@ use Rodrigofs\FilamentMasterdetail\Tests\datababe\factories\OrderItemFactory;
 final class OrderItem extends Model
 {
     use HasFactory;
+
     public $timestamps = false;
     protected $fillable = [
         'order_id',
         'product_id',
         'quantity',
+        'characteristics',
         'price',
     ];
 
@@ -27,6 +29,7 @@ final class OrderItem extends Model
         return [
             'quantity' => 'integer',
             'price' => 'decimal:2',
+            'characteristics' => 'array',
         ];
     }
 

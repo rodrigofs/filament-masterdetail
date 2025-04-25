@@ -11,7 +11,7 @@ use Illuminate\Session\Middleware\{AuthenticateSession, StartSession};
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Rodrigofs\FilamentMasterdetail\Tests\Resources\OrderResource;
+use Rodrigofs\FilamentMasterdetail\Tests\Resources\{OrderResource, SharerResource};
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -29,6 +29,7 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->resources([
                 OrderResource::class,
+                SharerResource::class
             ])
             ->middleware([
                 EncryptCookies::class,
