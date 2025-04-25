@@ -27,6 +27,7 @@ trait CanEditAction
             ->component($this)
             ->icon('heroicon-o-pencil-square')
             ->iconSize(IconSize::Small)
+            ->visible(fn (self $component): bool => $this->isEditable())
             ->modalHeading(__('filament-masterdetail::masterdetail.modal.heading.edit', [
                 'label' => $this->getModalHeading()
             ]))
@@ -60,7 +61,7 @@ trait CanEditAction
                     return;
                 }
 
-                $state = $this->getState();
+                $state = $component->getState();
 
                 $currentItemState = Arr::get($state, $itemKey, []);
 

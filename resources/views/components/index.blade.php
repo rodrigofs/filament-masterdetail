@@ -8,9 +8,7 @@
     $tableFields = $getTableFields();
     $breakPoint = $getBreakPoint();
     $hasContainers = count($containers) > 0;
-    $addAction = $getAction($getAddActionName());
     $deleteAction = $getAction($getDeleteActionName());
-    $isAddable = $isAddable();
     $isDeletable = $isDeletable();
     $isEditable = $isEditable();
     $editAction = $getAction($getEditActionName());
@@ -100,13 +98,6 @@
                         @endif
                     </div>
                 </td>
-
-                {{--                <td class="px-3 py-2 whitespace-nowrap text-sm">--}}
-                {{--                    @if ($isEditable)--}}
-                {{--                        {{ $editAction(['item' => $uuid]) }}--}}
-                {{--                    @endif--}}
-                {{--                </td>--}}
-
             </tr>
         @empty
             <tr>
