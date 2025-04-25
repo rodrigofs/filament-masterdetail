@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Illuminate\Contracts\View\View;
 use Rodrigofs\FilamentMasterdetail\Components\Masterdetail;
 use Rodrigofs\FilamentMasterdetail\Tests\Fixtures\Livewire as LivewireFixtures;
+
 final class TestComponentWithForm extends LivewireFixtures
 {
     public function form(Form $form): Form
